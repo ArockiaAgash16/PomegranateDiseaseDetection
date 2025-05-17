@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f9f8;
+            color: #333;
+            text-align: center;
+        }
+        h2, h3 {
+            color: #2c3e50;
+        }
+        img {
+            border-radius: 10px;
+            margin: 15px;
+        }
+        .uploaded, .gradcam {
+            width: 250px;
+            height: auto;
+        }
+        .gradcam-visual {
+            width: 50%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .chatbot-response {
+            background-color: #e3f6f5;
+            border-radius: 10px;
+            padding: 20px;
+            width: 80%;
+            margin: 30px auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        .pdf-btn, .back-btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .pdf-btn:hover, .back-btn:hover {
+            background-color: #219150;
+        }
+    </style>
+</head>
+<body>
+
+    {% if disease == "Healthy" %}
+        <h2>🌿 Fruit Status: <b>Healthy</b></h2>
+        <p style="color:green; font-weight: bold;">✅ No disease detected.</p>
+    {% else %}
+        <h2>🦠 Detected Disease: <b>{{ disease }}</b></h2>
+        <h3>📉 Severity Level: <b>{{ severity }}</b> ({{ severity_pct }}%)</h3>
+    {% endif %}
+
+    <h3>🖼️ Uploaded Image:</h3>
+    <img src="{{ url_for('static', filename='uploads/' + uploaded_image) }}" class="uploaded">
+
+    {% if full_gradcam_image %}
+        <h3>📊 Grad-CAM Visualization:</h3>
+        <img src="{{ url_for('static', filename='uploads/' + full_gradcam_image) }}" class="gradcam-visual">
+    {% elif disease == "Healthy" %}
+        <p style="color:green; font-weight:bold;">🟢 This fruit is healthy and there no visible lesions.</p>
+    {% else %}
+        <p style="color:red;">⚠️ Grad-CAM visualization not available.</p>
+    {% endif %}
+
+    <div class="chatbot-response">
+        <h3>🤖 AI Insight:</h3>
+        <p id="initial-chatbot-response" style="white-space:pre-line;">{{ chatbot_response | safe }}</p>
+    </div>
+
+    <div class="chatbot-response">
+        <h3>💬 Ask a Follow-up Question</h3>
+        <input type="text" id="user-question" placeholder="Type your question here..." style="width:70%; padding:8px;">
+        <button onclick="sendQuestion()" style="padding:8px 16px; margin-left:10px;">Ask</button>
+
+        <div id="chatbot-reply" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- ✅ PDF Download Button -->
+    <div>
+        <button class="pdf-btn" onclick="downloadPDF()">📄 Download Report</button>
+    </div>
+
+    <!-- ✅ Go Back Button at the Very End -->
+    <div>
+        <a href="/" class="back-btn">🔙 Go Back</a>
+    </div>
+
+    <script>
+    let history = [];
+
+    function sendQuestion() {
+        const question = document.getElementById("user-question").value.trim();
+        if (!question) return;
+
+        fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                question: question,
+                disease: "{{ disease }}",
+                severity: "{{ severity }}",
+                history: history
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.response) {
+                history.push({ user: question, bot: data.response });
+                const replyBox = document.getElementById("chatbot-reply");
+                replyBox.innerHTML += `<p><b>You:</b> ${question}</p><p><b>AI Assistant:</b> ${data.response}</p>`;
+                document.getElementById("user-question").value = '';
+            }
+        })
+        .catch(error => {
+            console.error("Follow-up chatbot error:", error);
+        });
+    }
+
+    function downloadPDF() {
+        fetch("/download_pdf", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                disease: "{{ disease }}",
+                severity: "{{ severity }}",
+                severity_pct: "{{ severity_pct }}",
+                chatbot_response: document.getElementById("initial-chatbot-response").innerText,
+                uploaded_image: "{{ uploaded_image }}",
+                history: history
+            })
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "pomegranate_report.pdf";
+            link.click();
+        })
+        .catch(error => {
+            console.error("PDF download error:", error);
+        });
+    }
+    </script>
+
+</body>
+</html>
