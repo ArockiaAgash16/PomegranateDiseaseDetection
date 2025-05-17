@@ -1,7 +1,5 @@
 # 🌿 AI-Driven Treatment Advisory System for Pomegranate Disease Diagnosis and Severity Analysis
 
-# 🍎 AI-Driven Treatment Advisory System for Pomegranate Disease Diagnosis and Severity Analysis
-
 This repository contains the implementation of a deep learning-powered, end-to-end AI system that classifies pomegranate fruit diseases, estimates severity, and generates severity-specific treatment recommendations using Retrieval-Augmented Generation (RAG) and a domain-specific Large Language Model (LLM).
 
 ## 📌 Project Highlights
@@ -24,6 +22,12 @@ This repository contains the implementation of a deep learning-powered, end-to-e
 ![image](https://github.com/user-attachments/assets/957e501d-7e14-4536-a9d6-60e369fc34cc)
 ![image](https://github.com/user-attachments/assets/6320071c-2d8e-475b-8cd9-c057e74405ed)
 ![image](https://github.com/user-attachments/assets/6afa6412-6ac7-4be3-b6a5-83bf51e55789)
+
+📌 Future Work
+
+Add multilingual support for regional Indian languages
+Expand to other crops (mango, guava, citrus)
+Deploy on cloud / edge (Raspberry Pi, Android)
 
 
 
