@@ -18,8 +18,8 @@ model = AutoModel.from_pretrained("BAAI/bge-small-en-v1.5")
 
 # ✅ Load Qdrant and embedding model
 qdrant = QdrantClient(
-    "https://343b2e97-9b15-4c33-949d-8a45f1a3c65f.eu-central-1-0.aws.cloud.qdrant.io:6333",
-    api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.laNIRuU-QroCce9WQpUttImv2_jzPBLVfdVv_QS0N2o"
+    "..........",
+    api_key="............"
 )
 
 collection_name = "pomegranate_disease_kb"
@@ -27,7 +27,7 @@ collection_name = "pomegranate_disease_kb"
 # ✅ OpenRouter API Setup for AI response generation
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key="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",
+    api_key="..................",
 )
 
 # ✅ Convert text into vector
